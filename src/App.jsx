@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { DataProvider } from './context/DataContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginLayout from './components/LoginLayout';
 
@@ -14,9 +15,8 @@ import AccountantDashboard from './pages/dashboards/AccountantDashboard';
 import SecurityDashboard from './pages/dashboards/SecurityDashboard';
 import KitchenDashboard from './pages/dashboards/KitchenDashboard';
 import TenantDashboard from './pages/dashboards/TenantDashboard';
-import InternalDashboard from './pages/dashboards/InternalDashboard';
 
-// Icons
+// Lucide Icons
 import { 
   FileText, 
   Settings, 
@@ -27,132 +27,165 @@ import {
   Home, 
   UserCheck, 
   CreditCard, 
-  MessageSquareWarning
+  MessageSquareWarning,
+  Wrench,
+  DollarSign,
+  ShieldCheck,
+  UtensilsCrossed,
+  Calendar,
+  ShoppingBag,
+  Clock
 } from 'lucide-react';
 
-// Background Images
-import internalDeskBg from './assets/super_admin_login_bg.jpg';
-import ownerBg from './assets/admin_login_bg.jpg';
-import managerBg from './assets/employee_login_bg.jpg';
-import residentBg from './assets/tenant_login_bg.jpg';
+// Relevant PG Images
+import { PG_IMAGES } from './assets/pgImages';
 
-// 4 Main Login Portals: Super Admin, Admin, Employee, Tenant
+// Dedicated Login Configurations for Each Separate Role
 const LOGIN_CONFIGS = {
   superadmin: {
     role: "Super Admin",
-    badgeText: "Super Admin",
+    badgeText: "Super Admin Portal",
     heading: "Super Admin System",
-    subtitle: "Secure Access for ArcNio Super Team",
-    description: "Manage PGs, monitor tenant limitations, track SaaS revenues, and automate system notifications.",
+    subtitle: "Enterprise Control Hub for PG Networks",
+    description: "Manage PGs, monitor tenant limits, track SaaS revenues, and automate system notifications across all properties.",
     primaryColor: "#0284c7",
-    bgImage: internalDeskBg,
-    sloganText: "Better Management for Better Living",
-    usernameLabel: "Super Admin Username",
-    loginDescription: "Login to access the ArcNio Super Admin control hub.",
+    pgImage: PG_IMAGES.buildingGrand,
+    sloganText: "Smart Management for Better Living",
+    usernameLabel: "Super Admin Username or Email",
+    loginDescription: "Sign in to access the Arcnio Super Admin control hub.",
     features: [
-      { icon: <TrendingUp size={16} />, text: "Reports" },
+      { icon: <TrendingUp size={16} />, text: "Network Reports" },
       { icon: <Settings size={16} />, text: "System Tools" },
-      { icon: <Sliders size={16} />, text: "Settings" }
-    ],
-    demoCredentials: {
-      email: "superadmin@arcnio.com",
-      pass: "admin123"
-    },
-    bottomTextRight: "🛡️ Authorized Access Only • ArcNio PG Management System"
+      { icon: <Sliders size={16} />, text: "Global Settings" },
+      { icon: <ShieldCheck size={16} />, text: "Franchise Audits" }
+    ]
   },
 
   admin: {
     role: "Admin",
-    badgeText: "Admin",
-    heading: "Admin Portal",
+    badgeText: "Admin Portal",
+    heading: "Admin & Owner Portal",
     subtitle: "Complete Control. Total Visibility.",
-    description: "Manage your PG with powerful insights and full access to all operational modules.",
+    description: "Manage your PG with powerful operational insights and full control over rooms, tenants, staff, and finances.",
     primaryColor: "#d97706",
-    bgImage: ownerBg,
+    pgImage: PG_IMAGES.buildingHitec,
     sloganText: "Your PG Our Priority",
-    usernameLabel: "Email / Phone",
+    usernameLabel: "Admin Email or Phone",
     loginDescription: "Sign in to manage your PG operations.",
     features: [
       { icon: <LayoutGrid size={16} />, text: "All Modules" },
-      { icon: <TrendingUp size={16} />, text: "Reports" },
-      { icon: <Settings size={16} />, text: "Settings" },
-      { icon: <Users size={16} />, text: "Users" }
-    ],
-    demoCredentials: {
-      email: "admin@arcnio.com",
-      pass: "owner123"
-    },
-    bottomTextRight: "🛡️ Admin Access • Full control • All modules • All data"
+      { icon: <TrendingUp size={16} />, text: "Revenue & Occupancy" },
+      { icon: <Settings size={16} />, text: "Configuration" },
+      { icon: <Users size={16} />, text: "Tenants & Staff" }
+    ]
   },
 
-  employee: {
-    role: "Employee",
-    badgeText: "Employee",
-    heading: "Employee Login",
-    subtitle: "Manage. Serve. Support.",
-    description: "Select your employee sub-role (Accountant, Manager, Security, Kitchen Staff) to sign in.",
+  manager: {
+    role: "Manager",
+    badgeText: "Manager Portal",
+    heading: "Property Manager Portal",
+    subtitle: "Daily PG Operations & Resident Care",
+    description: "Supervise check-ins and check-outs, coordinate maintenance tasks, allocate beds, and manage day-to-day PG resident services.",
     primaryColor: "#2563eb",
-    bgImage: managerBg,
-    sloganText: "Together for a Better PG Experience",
-    usernameLabel: "Email / Phone",
-    loginDescription: "Login to continue with your assigned staff role.",
+    pgImage: PG_IMAGES.roomDouble,
+    sloganText: "Operational Excellence Every Day",
+    usernameLabel: "Manager Email or Phone",
+    loginDescription: "Sign in to supervise daily PG operations.",
     features: [
-      { icon: <Home size={16} />, text: "Rooms" },
-      { icon: <Users size={16} />, text: "Tenants" },
-      { icon: <FileText size={16} />, text: "Complaints" },
-      { icon: <UserCheck size={16} />, text: "Visitors" }
-    ],
-    demoCredentials: {
-      email: "manager@arcnio.com",
-      pass: "manager123"
-    },
-    bottomTextRight: "👥 Accountant • Manager • Security • Kitchen Staff"
+      { icon: <Home size={16} />, text: "Room & Bed Allocations" },
+      { icon: <Users size={16} />, text: "Resident Check-ins" },
+      { icon: <Wrench size={16} />, text: "Maintenance Requests" },
+      { icon: <FileText size={16} />, text: "Daily Mess Updates" }
+    ]
+  },
+
+  accountant: {
+    role: "Accountant",
+    badgeText: "Accountant Portal",
+    heading: "Accounts & Financial Portal",
+    subtitle: "Rent Ledgers, Billing & Financial Tracking",
+    description: "Manage monthly rent invoicing, track tenant fee arrears, record vendor expense disbursements, and generate financial reports.",
+    primaryColor: "#059669",
+    pgImage: PG_IMAGES.amenityLounge,
+    sloganText: "Accurate Records & Transparent Finances",
+    usernameLabel: "Accountant Email or Phone",
+    loginDescription: "Sign in to manage rent billing and accounts.",
+    features: [
+      { icon: <CreditCard size={16} />, text: "Rent Fee Collection" },
+      { icon: <TrendingUp size={16} />, text: "Arrears Tracking" },
+      { icon: <DollarSign size={16} />, text: "Expense Ledgers" },
+      { icon: <FileText size={16} />, text: "Financial Statements" }
+    ]
+  },
+
+  security: {
+    role: "Security",
+    badgeText: "Security & Guard Portal",
+    heading: "Security & Gate Management",
+    subtitle: "Gate Passes, Visitor Logs & Safety",
+    description: "Verify tenant night passes, monitor guest check-ins, record delivery entries, and ensure round-the-clock facility security.",
+    primaryColor: "#dc2626",
+    pgImage: PG_IMAGES.buildingVista,
+    sloganText: "Safe & Secure Around the Clock",
+    usernameLabel: "Security Officer ID or Email",
+    loginDescription: "Sign in to verify gate passes and logs.",
+    features: [
+      { icon: <ShieldCheck size={16} />, text: "Digital Gate Passes" },
+      { icon: <UserCheck size={16} />, text: "Visitor Check-in Log" },
+      { icon: <Clock size={16} />, text: "Night-out Verification" },
+      { icon: <Users size={16} />, text: "Entry Monitoring" }
+    ]
+  },
+
+  kitchen: {
+    role: "Kitchen Staff",
+    badgeText: "Kitchen & Mess Portal",
+    heading: "Kitchen & Dining Management",
+    subtitle: "Daily Mess Menus & Meal Headcount",
+    description: "Publish daily breakfast, lunch, and dinner menus, monitor resident meal headcounts, manage grocery inventory, and track dietary requests.",
+    primaryColor: "#ea580c",
+    pgImage: PG_IMAGES.messDining,
+    sloganText: "Fresh, Nutritious & Delicious Meals",
+    usernameLabel: "Kitchen Staff ID or Email",
+    loginDescription: "Sign in to publish daily menus and manage groceries.",
+    features: [
+      { icon: <Calendar size={16} />, text: "Daily Menu Planning" },
+      { icon: <Users size={16} />, text: "Meal Headcount Sync" },
+      { icon: <ShoppingBag size={16} />, text: "Grocery Stock Control" },
+      { icon: <UtensilsCrossed size={16} />, text: "Special Diet Requests" }
+    ]
   },
 
   tenant: {
     role: "Tenant",
-    badgeText: "Tenant",
-    heading: "Tenant Login",
-    subtitle: "Your Stay. Our Priority.",
-    description: "Access your room details, payments, requests and more — all in one place.",
-    primaryColor: "#059669",
-    bgImage: residentBg,
-    sloganText: "Feel at Home",
-    usernameLabel: "Email / Phone",
-    loginDescription: "Login to access your tenant dashboard.",
+    badgeText: "Resident Portal",
+    heading: "Resident & Tenant Living Hub",
+    subtitle: "Your Stay. Your Comfort. Our Priority.",
+    description: "Access your room details, pay rent online, view today's hot mess menu, request gate passes, and raise quick maintenance tickets.",
+    primaryColor: "#7c3aed",
+    pgImage: PG_IMAGES.roomSingle,
+    sloganText: "Feel at Home with Arcnio",
+    usernameLabel: "Tenant Email or Phone",
+    loginDescription: "Sign in to access your personal tenant dashboard.",
     features: [
-      { icon: <Home size={16} />, text: "Room Info" },
-      { icon: <CreditCard size={16} />, text: "Payments" },
-      { icon: <MessageSquareWarning size={16} />, text: "Complaints" },
-      { icon: <FileText size={16} />, text: "Requests" }
-    ],
-    demoCredentials: {
-      email: "tenant@arcnio.com",
-      pass: "tenant123"
-    },
-    bottomTextRight: "🛡️ Safe • Comfortable • ArcNio"
+      { icon: <Home size={16} />, text: "Room & Bed Details" },
+      { icon: <CreditCard size={16} />, text: "Rent & Online Payment" },
+      { icon: <UtensilsCrossed size={16} />, text: "Daily Mess Menu" },
+      { icon: <MessageSquareWarning size={16} />, text: "Quick Service Requests" }
+    ]
   }
 };
 
-const ROLES_LIST = [
-  { key: 'superadmin', label: 'Super Admin' },
-  { key: 'admin', label: 'Admin' },
-  { key: 'employee', label: 'Employee' },
-  { key: 'tenant', label: 'Tenant' }
-];
-
-import { DataProvider } from './context/DataContext';
-
 function RoleLoginRouteWrapper() {
   const { roleKey } = useParams();
-  const currentRole = roleKey && LOGIN_CONFIGS[roleKey] ? roleKey : 'superadmin';
-  const currentConfig = LOGIN_CONFIGS[currentRole];
+  const normalizedKey = roleKey ? roleKey.toLowerCase() : 'tenant';
+  const validKey = LOGIN_CONFIGS[normalizedKey] ? normalizedKey : 'tenant';
+  const currentConfig = LOGIN_CONFIGS[validKey];
 
   return (
     <LoginLayout
       {...currentConfig}
-      rolesList={ROLES_LIST}
-      activeRoleKey={currentRole}
+      activeRoleKey={validKey}
     />
   );
 }
@@ -164,9 +197,22 @@ export default function App() {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              {/* LOGIN ROUTES */}
-              <Route path="/" element={<Navigate to="/login/superadmin" replace />} />
-              <Route path="/login" element={<Navigate to="/login/superadmin" replace />} />
+              {/* DEFAULT ROOT REDIRECT */}
+              <Route path="/" element={<Navigate to="/login/tenant" replace />} />
+              <Route path="/login" element={<Navigate to="/login/tenant" replace />} />
+
+              {/* SEPARATE DEDICATED LOGIN ROUTES FOR EACH ROLE */}
+              <Route path="/login/superadmin" element={<RoleLoginRouteWrapper />} />
+              <Route path="/login/admin" element={<RoleLoginRouteWrapper />} />
+              <Route path="/login/manager" element={<RoleLoginRouteWrapper />} />
+              <Route path="/login/accountant" element={<RoleLoginRouteWrapper />} />
+              <Route path="/login/security" element={<RoleLoginRouteWrapper />} />
+              <Route path="/login/kitchen" element={<RoleLoginRouteWrapper />} />
+              <Route path="/login/tenant" element={<RoleLoginRouteWrapper />} />
+
+              {/* ROLE ALIASES FOR BACKWARD COMPATIBILITY */}
+              <Route path="/login/owner" element={<Navigate to="/login/admin" replace />} />
+              <Route path="/login/employee" element={<Navigate to="/login/manager" replace />} />
               <Route path="/login/:roleKey" element={<RoleLoginRouteWrapper />} />
 
               {/* SUPER ADMIN DASHBOARD */}
@@ -191,7 +237,7 @@ export default function App() {
               <Route
                 path="/admin/dashboard/*"
                 element={
-                  <ProtectedRoute allowedRoles={['admin']}>
+                  <ProtectedRoute allowedRoles={['admin', 'owner']}>
                     <OwnerDashboard />
                   </ProtectedRoute>
                 }
@@ -262,7 +308,7 @@ export default function App() {
               />
 
               {/* FALLBACK REDIRECT */}
-              <Route path="*" element={<Navigate to="/login/superadmin" replace />} />
+              <Route path="*" element={<Navigate to="/login/tenant" replace />} />
             </Routes>
           </BrowserRouter>
         </AuthProvider>

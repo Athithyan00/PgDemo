@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import managerBg from '../../assets/employee_login_bg.jpg';
+import { PG_IMAGES } from '../../assets/pgImages';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { 
@@ -17,7 +17,9 @@ import {
   CheckCircle2,
   XCircle,
   Download,
-  RefreshCw
+  RefreshCw,
+  ShieldCheck,
+  Calendar
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -125,7 +127,6 @@ export default function KitchenDashboard() {
       roleThemeColor={roleThemeColor}
       sidebarItems={sidebarItems}
       activeTabKey={activeTab}
-      bgImage={managerBg}
       onBack={() => setActiveTab('overview')}
     >
       {/* OVERVIEW */}
@@ -135,6 +136,37 @@ export default function KitchenDashboard() {
             <div className="metric-card"><div className="metric-icon-box" style={{color: roleThemeColor}}><Utensils size={28}/></div><div className="metric-details"><h4>Today's Meals</h4><div className="metric-value">420</div></div></div>
             <div className="metric-card"><div className="metric-icon-box" style={{color: '#3b82f6'}}><List size={28}/></div><div className="metric-details"><h4>Food Requests</h4><div className="metric-value">{specialRequests.filter(r=>r.status==='Pending').length} Pending</div></div></div>
             <div className="metric-card"><div className="metric-icon-box" style={{color: '#ef4444'}}><Archive size={28}/></div><div className="metric-details"><h4>Low Stock Items</h4><div className="metric-value" style={{ color: '#ef4444' }}>{inventory.filter(i=>i.stockStatus==='Low Stock').length}</div></div></div>
+          </div>
+
+          {/* PG DINING & MESS SHOWCASE */}
+          <div className="dashboard-section-card" style={{ padding: '1.75rem', marginBottom: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', alignItems: 'center' }}>
+              <div style={{ borderRadius: '14px', overflow: 'hidden', height: '200px', position: 'relative', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                <img src={PG_IMAGES.messDining} alt="PG Dining Hall" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', padding: '4px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <ShieldCheck size={14} color="#34d399" /> Arcnio Certified Mess
+                </div>
+                <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', padding: '4px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, color: '#f59e0b' }}>
+                  FSSAI Hygiene: Grade A+
+                </div>
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--dash-text)' }}>
+                  Centralized Mess & Kitchen Operations
+                </h3>
+                <p style={{ color: 'var(--dash-muted)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '1rem' }}>
+                  Menu updates published here are instantly broadcasted live to Manager oversight logs and Tenant resident dashboards. All special dietary requests from residents sync automatically.
+                </p>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <button onClick={() => setActiveTab('menu')} className="btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>
+                    <Utensils size={15} /> Update Daily Menu
+                  </button>
+                  <button onClick={() => setActiveTab('requests')} className="btn-secondary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>
+                    <List size={15} /> View Resident Requests ({specialRequests.length})
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           
           <div className="dashboard-section-card" style={{ padding: '2rem' }}>
@@ -297,10 +329,17 @@ export default function KitchenDashboard() {
         <div className="modal-backdrop" onClick={() => setShowMenuModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}><div className="modal-header"><h3>{editingMenu ? 'Edit Menu' : 'Add Menu'}</h3></div>
             <form className="modal-form" onSubmit={(e) => handleSave(e, menuCosting, setMenuCosting, editingMenu, setShowMenuModal)}>
-              <div className="form-group"><label>Date</label><input type="text" name="date" defaultValue={editingMenu?.date} required /></div>
-              <div className="form-group"><label>Meal</label><input type="text" name="meal" defaultValue={editingMenu?.meal} required /></div>
-              <div className="form-group"><label>Menu</label><input type="text" name="menu" defaultValue={editingMenu?.menu} required /></div>
-              <div className="form-group"><label>Meal Count</label><input type="number" name="mealCount" defaultValue={editingMenu?.mealCount} required /></div>
+              <div className="form-group"><label>Date</label><input type="text" name="date" defaultValue={editingMenu?.date || '02 Oct 2026'} placeholder="e.g. 02 Oct 2026" required /></div>
+              <div className="form-group">
+                <label>Meal Category</label>
+                <select name="meal" defaultValue={editingMenu?.meal || 'Breakfast'} required>
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Dinner">Dinner</option>
+                </select>
+              </div>
+              <div className="form-group"><label>Menu Items</label><input type="text" name="menu" defaultValue={editingMenu?.menu} placeholder="e.g. Idli, Sambar, Coconut Chutney" required /></div>
+              <div className="form-group"><label>Estimated Meal Count</label><input type="number" name="mealCount" defaultValue={editingMenu?.mealCount || 150} required /></div>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}><button type="button" className="btn-secondary" onClick={() => setShowMenuModal(false)} style={{ flex: 1 }}>Cancel</button><button type="submit" className="btn-primary" style={{ flex: 1 }}>Save</button></div>
             </form>
           </div>

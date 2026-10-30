@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import internalDeskBg from '../../assets/super_admin_login_bg.jpg';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { 
@@ -344,7 +343,7 @@ export default function SuperAdminDashboard() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `ArcNio_Revenue_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("download", `Arcnio_Revenue_Report_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -373,12 +372,11 @@ export default function SuperAdminDashboard() {
 
   return (
     <DashboardLayout
-      title="ArcNio Super Admin Command Hub"
+      title="Arcnio Super Admin Command Hub"
       subtitle="Complete infrastructure oversight, SaaS billing, and multi-tenant PG control"
       roleThemeColor={roleThemeColor}
       sidebarItems={sidebarItems}
       activeTabKey={activeTab}
-      bgImage={internalDeskBg}
       onBack={() => setActiveTab('overview')}
     >
       {/* OVERVIEW TAB */}

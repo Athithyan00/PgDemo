@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import managerBg from '../../assets/employee_login_bg.jpg';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { 
@@ -164,7 +163,7 @@ export default function AccountantDashboard() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `ArcNio_Financial_Statement_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("download", `Arcnio_Financial_Statement_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -177,7 +176,6 @@ export default function AccountantDashboard() {
       roleThemeColor={roleThemeColor}
       sidebarItems={sidebarItems}
       activeTabKey={activeTab}
-      bgImage={managerBg}
       onBack={() => setActiveTab('overview')}
     >
       {/* OVERVIEW */}
@@ -475,7 +473,7 @@ export default function AccountantDashboard() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Invoice Receipt</h3>
-              <p>{viewingInvoice.invoiceNumber || `INV-100${viewingInvoice.id}`} • ArcNio PG Management</p>
+              <p>{viewingInvoice.invoiceNumber || `INV-100${viewingInvoice.id}`} • Arcnio PG Management</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginTop: '1rem' }}>
               <div><span style={{ color: 'var(--dash-muted)', fontSize: '0.8rem' }}>Tenant Name</span><div style={{ fontWeight: 700 }}>{viewingInvoice.tenant}</div></div>

@@ -8,42 +8,32 @@ import {
   Eye, 
   EyeOff, 
   ArrowRight, 
-  KeyRound, 
-  CheckCircle, 
   Lock, 
   User, 
   X, 
   Building2, 
   ShieldCheck, 
-  Home, 
   AlertTriangle,
-  Server,
-  Briefcase,
-  Crown,
+  CheckCircle,
   Sun,
   Moon,
-  DollarSign,
-  Shield,
-  Utensils
+  KeyRound
 } from 'lucide-react';
 import './LoginLayout.css';
 
 export default function LoginLayout({
-  role,
-  badgeText,
-  heading,
-  subtitle,
-  description,
-  features,
-  loginDescription,
-  primaryColor,
-  bgImage,
+  role = "User",
+  badgeText = "Portal",
+  heading = "Sign In",
+  subtitle = "Arcnio Smart PG System",
+  description = "Access your dedicated PG management dashboard.",
+  features = [],
+  loginDescription = "Please enter your registered credentials to continue.",
+  primaryColor = "#2563eb",
+  pgImage,
   sloganText,
-  usernameLabel = "Email / Phone",
-  rolesList = [],
-  activeRoleKey,
-  onSelectRole,
-  demoCredentials = { email: "user@arcnio.com", pass: "password123" }
+  usernameLabel = "Email, Phone or Username",
+  activeRoleKey = "tenant"
 }) {
   const { login } = useAuth();
   const { toggleTheme, isDark } = useTheme();
@@ -54,9 +44,6 @@ export default function LoginLayout({
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Employee Sub-Role State
-  const [activeSubRole, setActiveSubRole] = useState('manager');
-  
   // Validation & Error States
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -70,38 +57,21 @@ export default function LoginLayout({
   const [forgotEmailError, setForgotEmailError] = useState('');
   const [forgotSubmitted, setForgotSubmitted] = useState(false);
 
-  // Update demo credentials based on active role & sub-role
-  const currentDemo = activeRoleKey === 'employee' ? {
-    accountant: { email: "accountant@arcnio.com", pass: "accountant123" },
-    manager: { email: "manager@arcnio.com", pass: "manager123" },
-    security: { email: "security@arcnio.com", pass: "security123" },
-    kitchen: { email: "kitchen@arcnio.com", pass: "kitchen123" }
-  }[activeSubRole] : demoCredentials;
-
-  // Restore remembered username on role switch
+  // Restore remembered username on role switch or reset fields clean
   useEffect(() => {
-    const targetKey = activeRoleKey === 'employee' ? activeSubRole : activeRoleKey;
-    const remembered = authService.getRememberedUser(targetKey);
+    const remembered = authService.getRememberedUser(activeRoleKey);
     if (remembered) {
       setUsername(remembered);
       setRememberMe(true);
     } else {
-      setUsername(currentDemo.email);
-      setPassword(currentDemo.pass);
+      setUsername('');
       setRememberMe(false);
     }
+    setPassword('');
     setUsernameError('');
     setPasswordError('');
     setLoginError('');
-  }, [activeRoleKey, activeSubRole]);
-
-  const handleFillDemo = () => {
-    setUsername(currentDemo.email);
-    setPassword(currentDemo.pass);
-    setUsernameError('');
-    setPasswordError('');
-    setLoginError('');
-  };
+  }, [activeRoleKey]);
 
   const handleUsernameChange = (e) => {
     const val = e.target.value;
@@ -143,7 +113,6 @@ export default function LoginLayout({
     try {
       const res = await login({
         roleKey: activeRoleKey,
-        subRoleKey: activeRoleKey === 'employee' ? activeSubRole : null,
         identifier: username,
         password,
         rememberMe
@@ -152,12 +121,12 @@ export default function LoginLayout({
       setIsSubmitting(false);
 
       if (res.success) {
-        setLoginSuccessMessage(`Authenticated successfully! Redirecting...`);
+        setLoginSuccessMessage('Authenticated successfully! Redirecting to your dashboard...');
         setTimeout(() => {
           navigate(res.redirectPath, { replace: true });
-        }, 400);
+        }, 350);
       } else {
-        setLoginError(res.error);
+        setLoginError(res.error || 'Authentication failed. Please verify your credentials.');
       }
     } catch {
       setIsSubmitting(false);
@@ -178,31 +147,21 @@ export default function LoginLayout({
       setForgotSubmitted(false);
       setShowForgotModal(false);
       setForgotEmail('');
-    }, 2400);
-  };
-
-  const primaryRoleIcons = {
-    superadmin: <Server size={15} />,
-    admin: <Crown size={15} />,
-    employee: <Briefcase size={15} />,
-    tenant: <Home size={15} />
+    }, 2200);
   };
 
   return (
     <div className="login-container" style={{ '--primary-color': primaryColor }}>
-      {/* LEFT PANEL */}
+      {/* LEFT BRANDING & PG SHOWCASE PANEL */}
       <div className="login-left-panel">
-        <img src={bgImage} alt={`${role} Background`} className="login-bg-image" />
-        <div className="login-overlay"></div>
-        
         <div className="login-left-content">
           <div className="login-brand">
             <div className="brand-logo-badge">
               <div className="brand-icon-box" style={{ backgroundColor: primaryColor }}>
-                <Building2 size={20} color="#ffffff" />
+                <Building2 size={22} color="#ffffff" />
               </div>
               <div>
-                <span className="brand-name">ArcNio</span>
+                <span className="brand-name">Arcnio</span>
                 <span className="brand-subtitle">PG Management System</span>
               </div>
             </div>
@@ -213,16 +172,46 @@ export default function LoginLayout({
             {subtitle && <h3 className="login-tagline">{subtitle}</h3>}
             <p>{description}</p>
             
-            <div className="login-features">
-              {features.map((feature, index) => (
-                <div key={index} className="login-feature-item">
-                  <div className="feature-icon-wrapper">
-                    {feature.icon}
+            {/* PG RELEVANT IMAGE SHOWCASE */}
+            {pgImage && (
+              <div className="login-pg-showcase-card">
+                <div className="pg-card-image-wrap">
+                  <img 
+                    src={pgImage} 
+                    alt={`${role} PG Accommodation`} 
+                    className="pg-showcase-img" 
+                  />
+                  <div className="pg-card-badge-top">
+                    <ShieldCheck size={14} color="#34d399" />
+                    <span>Arcnio Verified PG</span>
                   </div>
-                  <span className="feature-text">{feature.text}</span>
+                  <div className="pg-card-badge-bottom">
+                    <span>★ 4.9 • 3 Meals • Wi-Fi • Security</span>
+                  </div>
                 </div>
-              ))}
-            </div>
+                <div className="pg-card-meta">
+                  <span className="pg-card-title">
+                    {role === 'Tenant' ? 'Deluxe Resident Living & Dining' : 'Arcnio Smart PG Residency Network'}
+                  </span>
+                  <span className="pg-card-sub">
+                    Clean, comfortable rooms with 24/7 power backup, high-speed Wi-Fi & mess
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {features.length > 0 && (
+              <div className="login-features">
+                {features.map((feature, index) => (
+                  <div key={index} className="login-feature-item">
+                    <div className="feature-icon-wrapper">
+                      {feature.icon}
+                    </div>
+                    <span className="feature-text">{feature.text}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           
           <div className="login-left-footer">
@@ -231,79 +220,46 @@ export default function LoginLayout({
         </div>
       </div>
 
-      {/* RIGHT PANEL */}
+      {/* RIGHT DEDICATED LOGIN FORM PANEL */}
       <div className="login-right-panel">
-        {/* THEME TOGGLE BUTTON AT TOP RIGHT CORNER */}
-        <button 
-          type="button" 
-          className="theme-toggle-btn"
-          onClick={toggleTheme}
-          title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
-        >
-          {isDark ? <Sun size={18} color="#f59e0b" /> : <Moon size={18} color="#0f172a" />}
-        </button>
+        {/* TOP BAR WITH THEME TOGGLE */}
+        <div className="login-top-bar">
+          <button 
+            type="button" 
+            className="theme-toggle-pill"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
+            title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
+          >
+            {isDark ? (
+              <>
+                <Sun size={15} className="theme-toggle-icon sun-icon" />
+                <span>Light Mode</span>
+              </>
+            ) : (
+              <>
+                <Moon size={15} className="theme-toggle-icon moon-icon" />
+                <span>Dark Mode</span>
+              </>
+            )}
+          </button>
+        </div>
 
         <div className="login-form-container">
-          
-          {/* TOP LEFT ROLE SELECTOR TABS BAR */}
-          <div className="top-left-roles-header">
-            <span className="roles-nav-title">Select Portal:</span>
-            <div className="role-selector-bar top-left-bar">
-              {rolesList.map((r) => {
-                const isActive = r.key === activeRoleKey;
-                return (
-                  <button
-                    key={r.key}
-                    type="button"
-                    className={`role-tab ${isActive ? 'active' : ''}`}
-                    onClick={() => {
-                      if (onSelectRole) onSelectRole(r.key);
-                      navigate(`/login/${r.key}`);
-                    }}
-                    style={isActive ? { backgroundColor: primaryColor, color: '#ffffff' } : {}}
-                  >
-                    {primaryRoleIcons[r.key] || <ShieldCheck size={15} />}
-                    <span>{r.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* DE-CONGESTED EMPLOYEE DIVISION SUB-ROLE SELECTOR */}
-          {activeRoleKey === 'employee' && (
-            <div className="employee-subroles-bar">
-              <span className="subrole-title">Employee Department:</span>
-              <div className="subrole-pills">
-                {[
-                  { key: 'accountant', label: 'Accountant', icon: <DollarSign size={14} /> },
-                  { key: 'manager', label: 'Manager', icon: <Briefcase size={14} /> },
-                  { key: 'security', label: 'Security', icon: <Shield size={14} /> },
-                  { key: 'kitchen', label: 'Kitchen Staff', icon: <Utensils size={14} /> }
-                ].map((sub) => {
-                  const isSelected = activeSubRole === sub.key;
-                  return (
-                    <button
-                      key={sub.key}
-                      type="button"
-                      className={`subrole-pill ${isSelected ? 'selected' : ''}`}
-                      onClick={() => setActiveSubRole(sub.key)}
-                    >
-                      {sub.icon}
-                      <span>{sub.label}</span>
-                    </button>
-                  );
-                })}
+          <div className="login-form-header">
+            <div className="login-form-header-top">
+              <h2>Welcome Back</h2>
+              <div 
+                className="login-role-badge-pill" 
+                style={{ 
+                  color: primaryColor, 
+                  backgroundColor: `${primaryColor}15`, 
+                  borderColor: `${primaryColor}30` 
+                }}
+              >
+                {badgeText}
               </div>
             </div>
-          )}
-
-          <div className="login-role-badge-pill" style={{ color: primaryColor, backgroundColor: `${primaryColor}15`, borderColor: `${primaryColor}30` }}>
-            {badgeText}
-          </div>
-          
-          <div className="login-form-header">
-            <h2>Welcome Back</h2>
             <p>{loginDescription}</p>
           </div>
 
@@ -322,17 +278,6 @@ export default function LoginLayout({
             </div>
           )}
 
-          {/* DEMO CREDENTIALS BANNER */}
-          <div className="demo-credentials-banner">
-            <div className="demo-info">
-              <span className="demo-label">Demo Credentials:</span>
-              <code>{currentDemo.email}</code> / <code>{currentDemo.pass}</code>
-            </div>
-            <button type="button" className="fill-demo-btn" onClick={handleFillDemo}>
-              Autofill
-            </button>
-          </div>
-          
           <form onSubmit={handleSubmit} className="login-form" noValidate>
             <div className={`form-group ${usernameError ? 'has-error' : ''}`}>
               <div className="input-wrapper">
@@ -406,7 +351,7 @@ export default function LoginLayout({
                 <span className="btn-spinner"></span>
               ) : (
                 <>
-                  <span>Login</span>
+                  <span>Sign In</span>
                   <ArrowRight size={18} />
                 </>
               )}
@@ -414,9 +359,8 @@ export default function LoginLayout({
           </form>
           
           <div className="login-form-footer">
-            ArcNio PG Management System
+            Arcnio PG Management System • Secure Role Login
           </div>
-
         </div>
       </div>
 
@@ -447,7 +391,7 @@ export default function LoginLayout({
                     <label>Email or Phone Number</label>
                     <input 
                       type="text" 
-                      placeholder="admin@arcnio.com or +91 9876543210" 
+                      placeholder="e.g. user@arcnio.com or +91 98765 43210" 
                       value={forgotEmail}
                       onChange={(e) => {
                         setForgotEmail(e.target.value);

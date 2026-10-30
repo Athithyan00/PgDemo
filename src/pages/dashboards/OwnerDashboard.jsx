@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import ownerBg from '../../assets/admin_login_bg.jpg';
+import { PG_IMAGES } from '../../assets/pgImages';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { 
@@ -22,7 +22,9 @@ import {
   XCircle,
   Trash2,
   Coffee,
-  Archive
+  Archive,
+  ShieldCheck,
+  MapPin
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -101,7 +103,7 @@ export default function OwnerDashboard() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `ArcNio_Operations_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("download", `Arcnio_Operations_Report_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -212,7 +214,6 @@ export default function OwnerDashboard() {
       roleThemeColor={roleThemeColor}
       sidebarItems={sidebarItems}
       activeTabKey={activeTab}
-      bgImage={ownerBg}
       onBack={() => setActiveTab('overview')}
     >
       {/* OVERVIEW */}
@@ -223,6 +224,40 @@ export default function OwnerDashboard() {
             <div className="metric-card"><div className="metric-icon-box" style={{color: '#2563eb'}}><Building2 size={28}/></div><div className="metric-details"><h4>Total Rooms</h4><div className="metric-value">{roomsData.length}</div></div></div>
             <div className="metric-card"><div className="metric-icon-box" style={{color: '#10b981'}}><BedDouble size={28}/></div><div className="metric-details"><h4>Occupied Beds</h4><div className="metric-value">172</div></div></div>
             <div className="metric-card"><div className="metric-icon-box" style={{color: '#ef4444'}}><AlertCircle size={28}/></div><div className="metric-details"><h4>Complaints</h4><div className="metric-value">{complaintsData.filter(c => c.status === 'Pending').length}</div></div></div>
+          </div>
+
+          {/* ADMIN PROPERTY SHOWCASE */}
+          <div className="dashboard-section-card" style={{ padding: '1.75rem', marginBottom: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', alignItems: 'center' }}>
+              <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', height: '200px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                <img src={PG_IMAGES.buildingHitec} alt="Arcnio Cyber Towers" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', padding: '4px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <ShieldCheck size={14} color="#34d399" /> Flagship Property
+                </div>
+                <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', padding: '4px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, color: '#38bdf8' }}>
+                  80 Rooms • 150 Beds
+                </div>
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--dash-muted)', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
+                  <MapPin size={14} /> HITEC City, Hyderabad
+                </div>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--dash-text)' }}>
+                  Arcnio Cyber Towers Executive Residency
+                </h3>
+                <p style={{ color: 'var(--dash-muted)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '1rem' }}>
+                  Premium student & working professional accommodations. Features high-speed commercial fiber, biometric entrance gate, automated mess kitchen, and daily housekeeping.
+                </p>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <button onClick={() => setActiveTab('rooms')} className="btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>
+                    <Building2 size={15} /> Manage Rooms
+                  </button>
+                  <button onClick={() => setActiveTab('tenants')} className="btn-secondary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>
+                    <Users size={15} /> All Tenants
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           
           <div className="dashboard-section-card" style={{ padding: '2rem' }}>

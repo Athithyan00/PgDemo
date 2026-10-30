@@ -309,12 +309,6 @@ export default function DashboardLayout({
 
   return (
     <div className="dashboard-container" style={{ '--theme-color': roleThemeColor }}>
-      {bgImage && (
-        <div 
-          className="dashboard-bg-overlay"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        />
-      )}
       {/* SIDEBAR */}
       <aside className="dashboard-sidebar">
         <div className="sidebar-brand">
@@ -322,7 +316,7 @@ export default function DashboardLayout({
             <Building size={20} color="#ffffff" />
           </div>
           <div>
-            <h3>ArcNio</h3>
+            <h3>Arcnio</h3>
             <span className="brand-role-tag">{user?.roleTitle || user?.role?.toUpperCase()}</span>
           </div>
         </div>

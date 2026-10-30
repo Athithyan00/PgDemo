@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import managerBg from '../../assets/employee_login_bg.jpg';
+import { PG_IMAGES } from '../../assets/pgImages';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { 
@@ -23,7 +23,9 @@ import {
   Plus,
   Download,
   FileCheck,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck,
+  MapPin
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -72,9 +74,6 @@ export default function ManagerDashboard() {
       )
     );
   };
-
-  const kitchenMenu = { breakfast: 'Idli, Chutney', lunch: 'Rice, Dal, Paneer', dinner: 'Roti, Mixed Veg' };
-  const kitchenStatus = 'Operational';
 
   // Modal States
   const [showTenantModal, setShowTenantModal] = useState(false); const [editingTenant, setEditingTenant] = useState(null);
@@ -164,7 +163,6 @@ export default function ManagerDashboard() {
       roleThemeColor={roleThemeColor}
       sidebarItems={sidebarItems}
       activeTabKey={activeTab}
-      bgImage={managerBg}
       onBack={() => setActiveTab('overview')}
     >
       {/* OVERVIEW */}
@@ -175,6 +173,40 @@ export default function ManagerDashboard() {
             <div className="metric-card"><div className="metric-icon-box" style={{color: '#10b981'}}><BedDouble size={28}/></div><div className="metric-details"><h4>Occupied Beds</h4><div className="metric-value">{roomsBedsData.filter(r=>r.status==='Occupied').length}</div></div></div>
             <div className="metric-card"><div className="metric-icon-box" style={{color: '#ef4444'}}><AlertCircle size={28}/></div><div className="metric-details"><h4>Complaints</h4><div className="metric-value">{complaintsData.filter(c=>c.status==='Pending').length}</div></div></div>
             <div className="metric-card"><div className="metric-icon-box" style={{color: '#f59e0b'}}><Clock size={28}/></div><div className="metric-details"><h4>Requests</h4><div className="metric-value">{requestsData.filter(r=>r.status!=='Approved').length}</div></div></div>
+          </div>
+
+          {/* MANAGED PROPERTY SHOWCASE */}
+          <div className="dashboard-section-card" style={{ padding: '1.75rem', marginBottom: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', alignItems: 'center' }}>
+              <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', height: '200px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                <img src={PG_IMAGES.buildingVista} alt="The Vista Co-Living Hub" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', padding: '4px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <ShieldCheck size={14} color="#34d399" /> Managed PG Facility
+                </div>
+                <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', padding: '4px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, color: '#38bdf8' }}>
+                  96% Occupied
+                </div>
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--dash-muted)', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
+                  <MapPin size={14} /> Indiranagar, Bengaluru
+                </div>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--dash-text)' }}>
+                  The Vista Co-Living Hub (Block A & B)
+                </h3>
+                <p style={{ color: 'var(--dash-muted)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '1rem' }}>
+                  100 Rooms • 200 Total Beds • 192 Active Residents • High-Speed 1Gbps Fiber • Centralized Mess & 24/7 Security.
+                </p>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <button onClick={() => setActiveTab('rooms')} className="btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>
+                    <BedDouble size={15} /> Room Allocations
+                  </button>
+                  <button onClick={() => setActiveTab('kitchen')} className="btn-secondary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>
+                    <Coffee size={15} /> Kitchen & Menu Log
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="dashboard-section-card" style={{ padding: '2rem' }}>

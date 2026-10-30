@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import internalDeskBg from '../../assets/super_admin_login_bg.jpg';
 import { useAuth } from '../../context/AuthContext';
 import { 
   Server, 
@@ -69,12 +68,11 @@ export default function InternalDashboard() {
 
   return (
     <DashboardLayout
-      title="ArcNio System Command Hub"
+      title="Arcnio System Command Hub"
       subtitle={`Internal Infrastructure Admin • ${user?.name || 'Super Administrator'}`}
       roleThemeColor="#0284c7"
       sidebarItems={sidebarItems}
       activeTabKey={activeTab}
-      bgImage={internalDeskBg}
       onBack={() => setActiveTab('overview')}
     >
       {/* OVERVIEW TAB */}

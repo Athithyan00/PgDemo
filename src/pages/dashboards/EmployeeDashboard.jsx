@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import managerBg from '../../assets/employee_login_bg.jpg';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { 
@@ -133,11 +132,10 @@ export default function EmployeeDashboard() {
   return (
     <DashboardLayout
       title="Property Operations & Staff Portal"
-      subtitle={`Assigned Property: ${user?.assignedProperty || 'ArcNio Grand Co-Living'} • ${user?.name || 'Staff'}`}
+      subtitle={`Assigned Property: ${user?.assignedProperty || 'Arcnio Grand Co-Living'} • ${user?.name || 'Staff'}`}
       roleThemeColor="#059669"
       sidebarItems={sidebarItems}
       activeTabKey={activeTab}
-      bgImage={managerBg}
       onBack={() => setActiveTab('overview')}
     >
       {/* METRICS */}

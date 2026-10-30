@@ -2,28 +2,29 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import residentBg from '../../assets/tenant_login_bg.jpg';
+import { PG_IMAGES } from '../../assets/pgImages';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { 
   Home, 
   Bed, 
   CreditCard, 
-  AlertCircle,
-  FileText,
-  UserCheck,
-  Coffee,
-  Calendar,
-  Bell,
-  FileBadge,
-  Download,
-  Eye,
-  Plus,
-  Trash2,
-  Edit2,
-  CheckCircle2,
-  QrCode,
-  ShieldCheck
+  AlertCircle, 
+  FileText, 
+  UserCheck, 
+  Coffee, 
+  Calendar, 
+  Bell, 
+  FileBadge, 
+  Download, 
+  Eye, 
+  Plus, 
+  Trash2, 
+  Edit2, 
+  CheckCircle2, 
+  QrCode, 
+  ShieldCheck,
+  Utensils
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -57,6 +58,7 @@ export default function TenantDashboard() {
 
   const [showVisitorModal, setShowVisitorModal] = useState(false);
   const [showAmenityModal, setShowAmenityModal] = useState(false);
+  const [showDietaryModal, setShowDietaryModal] = useState(false);
 
   // Interactive Payment Gateway State
   const [payingRentItem, setPayingRentItem] = useState(null);
@@ -74,9 +76,21 @@ export default function TenantDashboard() {
     { id: 2, month: 'Sep 2026', rentAmount: '₹10,800', dueDate: '05 Sep 2026', status: 'Paid', paidOn: '04 Sep 2026' },
   ]);
   
-  const { myComplaints, setMyComplaints } = dataContext;
-  const { myRequests, setMyRequests } = dataContext;
-  const { visitorPasses, setVisitorPasses, searchQuery } = dataContext;
+  const { 
+    myComplaints, 
+    setMyComplaints, 
+    myRequests, 
+    setMyRequests, 
+    visitorPasses, 
+    setVisitorPasses, 
+    searchQuery,
+    menuCosting = [],
+    getDailyMessMenu = () => [],
+    specialRequests = [],
+    setSpecialRequests = () => {},
+    announcements = [],
+    setAnnouncements = () => {}
+  } = dataContext;
 
   const filterList = (items) => {
     if (!items) return [];
@@ -88,21 +102,11 @@ export default function TenantDashboard() {
       )
     );
   };
-  
-  const messMenu = [
-    { id: 1, date: '02 Oct 2026', breakfast: 'Idli, Sambar', lunch: 'Rice, Dal, Paneer', dinner: 'Roti, Sabzi' },
-    { id: 2, date: '03 Oct 2026', breakfast: 'Poha, Boiled Eggs', lunch: 'Veg Biryani, Raita', dinner: 'Chapati, Chana Masala' }
-  ];
 
   const [amenityBookings, setAmenityBookings] = useState([
     { id: 1, amenity: 'Gym (Evening Slot)', date: '02 Oct 2026', time: '06:00 PM', status: 'Confirmed' },
     { id: 2, amenity: 'Study Room Cubicle 4', date: '04 Oct 2026', time: '10:00 AM', status: 'Confirmed' }
   ]);
-
-  const announcements = [
-    { id: 1, title: 'Lift Maintenance', description: 'Lift will be under maintenance tomorrow from 2 PM to 4 PM.', date: '01 Oct 2026', status: 'Active' },
-    { id: 2, title: 'Wi-Fi Speed Upgrade', description: 'Broadband routers will reboot tonight at 02:00 AM.', date: '03 Oct 2026', status: 'Active' }
-  ];
 
   const documents = [
     { id: 1, documentName: 'Rental Agreement', date: '01 Aug 2026', status: 'Signed', size: '1.4 MB' },
@@ -175,6 +179,21 @@ export default function TenantDashboard() {
     }
   };
 
+  const handleSaveDietary = (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const item = {
+      id: Date.now(),
+      tenant: user?.name || 'Rahul Sharma',
+      meal: fd.get('meal'),
+      request: fd.get('request'),
+      date: fd.get('date') || '02 Oct 2026',
+      status: 'Pending'
+    };
+    setSpecialRequests([...specialRequests, item]);
+    setShowDietaryModal(false);
+  };
+
   const handleSaveAmenity = (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
@@ -223,7 +242,6 @@ export default function TenantDashboard() {
       roleThemeColor={roleThemeColor}
       sidebarItems={sidebarItems}
       activeTabKey={activeTab}
-      bgImage={residentBg}
       onBack={() => setActiveTab('overview')}
     >
       {/* OVERVIEW */}
@@ -268,12 +286,45 @@ export default function TenantDashboard() {
       {/* MY ROOM DETAILS */}
       {activeTab === 'room' && (
         <div className="dashboard-section-card">
-          <div className="section-header"><h3>My Room Details</h3></div>
+          <div className="section-header">
+            <h3>My PG Room Details</h3>
+            <span style={{ backgroundColor: 'rgba(16,185,129,0.12)', color: '#10b981', padding: '4px 12px', borderRadius: '999px', fontWeight: 700, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <ShieldCheck size={14} /> Active Verified Resident
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '2rem', alignItems: 'center' }}>
+            <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', height: '220px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+              <img src={PG_IMAGES.roomDouble} alt="My PG Room 204" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', padding: '4px 12px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <ShieldCheck size={14} color="#34d399" /> Room 204 • Bed B
+              </div>
+              <div style={{ position: 'absolute', bottom: 12, right: 12, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', padding: '4px 12px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, color: '#38bdf8' }}>
+                Deluxe 2-Sharing AC
+              </div>
+            </div>
+            <div>
+              <h4 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--dash-text)' }}>
+                Deluxe Twin Residency Suite
+              </h4>
+              <p style={{ color: 'var(--dash-muted)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '1.25rem' }}>
+                Fully furnished with individual wooden study desks, personal wardrobes, air conditioning, 24/7 power backup, and attached private washroom.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {['Air Conditioned', 'High-Speed Wi-Fi', 'Attached Washroom', 'Daily Housekeeping', 'Biometric Gate Access', '24/7 CCTV'].map((feat, i) => (
+                  <span key={i} style={{ background: 'var(--dash-subcard-bg)', border: '1px solid var(--dash-border)', padding: '4px 10px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600, color: 'var(--dash-text)' }}>
+                    ✓ {feat}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
-            <div style={{ background: 'var(--dash-subcard-bg)', padding: '1.5rem', borderRadius: '12px' }}><label style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', fontWeight: 700 }}>Room Number</label><div style={{ fontSize: '1.4rem', fontWeight: 800, marginTop: '0.5rem' }}>{roomDetails.roomNumber}</div></div>
-            <div style={{ background: 'var(--dash-subcard-bg)', padding: '1.5rem', borderRadius: '12px' }}><label style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', fontWeight: 700 }}>Bed Number</label><div style={{ fontSize: '1.4rem', fontWeight: 800, marginTop: '0.5rem' }}>{roomDetails.bedNumber}</div></div>
-            <div style={{ background: 'var(--dash-subcard-bg)', padding: '1.5rem', borderRadius: '12px' }}><label style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', fontWeight: 700 }}>Room Type</label><div style={{ fontSize: '1.4rem', fontWeight: 800, marginTop: '0.5rem' }}>{roomDetails.roomType}</div></div>
-            <div style={{ background: 'var(--dash-subcard-bg)', padding: '1.5rem', borderRadius: '12px' }}><label style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', fontWeight: 700 }}>Roommates</label><div style={{ fontSize: '1.2rem', fontWeight: 700, marginTop: '0.5rem' }}>{roomDetails.roommates}</div></div>
+            <div style={{ background: 'var(--dash-subcard-bg)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--dash-border)' }}><label style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', fontWeight: 700 }}>Room Number</label><div style={{ fontSize: '1.4rem', fontWeight: 800, marginTop: '0.5rem' }}>{roomDetails.roomNumber}</div></div>
+            <div style={{ background: 'var(--dash-subcard-bg)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--dash-border)' }}><label style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', fontWeight: 700 }}>Bed Number</label><div style={{ fontSize: '1.4rem', fontWeight: 800, marginTop: '0.5rem' }}>Bed {roomDetails.bedNumber}</div></div>
+            <div style={{ background: 'var(--dash-subcard-bg)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--dash-border)' }}><label style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', fontWeight: 700 }}>Room Type</label><div style={{ fontSize: '1.4rem', fontWeight: 800, marginTop: '0.5rem' }}>{roomDetails.roomType}</div></div>
+            <div style={{ background: 'var(--dash-subcard-bg)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--dash-border)' }}><label style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', fontWeight: 700 }}>Roommates</label><div style={{ fontSize: '1.2rem', fontWeight: 700, marginTop: '0.5rem' }}>{roomDetails.roommates}</div></div>
           </div>
         </div>
       )}
@@ -427,16 +478,134 @@ export default function TenantDashboard() {
         </div>
       )}
 
-      {/* OTHER READ-ONLY SECTIONS (Mess, Amenities, Announcements, Documents) */}
+      {/* MESS & FOOD MENU (INTERCONNECTED LIVE WITH KITCHEN) */}
       {activeTab === 'mess' && (
         <div className="dashboard-section-card">
-          <div className="section-header"><h3>Mess & Food Menu ({filterList(messMenu).length})</h3></div>
-          <div className="table-responsive">
+          <div className="section-header">
+            <div>
+              <h3>Daily Mess & Food Menu</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', marginTop: '2px' }}>
+                Wholesome & nutritious meals • Real-time live synchronization with Kitchen department
+              </p>
+            </div>
+            <button onClick={() => setShowDietaryModal(true)} className="btn-primary">
+              <Plus size={16} /> Request Special Meal / Diet
+            </button>
+          </div>
+
+          {/* TODAY'S 3 MEALS VISUAL CARDS */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+            {/* Breakfast */}
+            <div style={{ background: 'var(--dash-subcard-bg)', border: '1px solid var(--dash-border)', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: 'var(--shadow-sm)' }}>
+              <div style={{ height: '140px', position: 'relative' }}>
+                <img src={PG_IMAGES.breakfast} alt="Breakfast" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(6px)', padding: '3px 10px', borderRadius: '999px', color: '#fff', fontSize: '0.75rem', fontWeight: 700 }}>
+                  Breakfast (7:30 - 10:00 AM)
+                </span>
+              </div>
+              <div style={{ padding: '1.1rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--dash-text)' }}>Today's Breakfast</h4>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', lineHeight: 1.45 }}>
+                    {menuCosting.find(m => m.meal?.toLowerCase() === 'breakfast')?.menu || 'Idli, Medu Vada, Sambar, Fresh Coconut Chutney & Tea/Coffee'}
+                  </p>
+                </div>
+                <span style={{ display: 'inline-block', marginTop: '0.85rem', fontSize: '0.75rem', fontWeight: 700, color: '#10b981' }}>
+                  ✓ Freshly Prepared & Steaming Hot
+                </span>
+              </div>
+            </div>
+
+            {/* Lunch */}
+            <div style={{ background: 'var(--dash-subcard-bg)', border: '1px solid var(--dash-border)', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: 'var(--shadow-sm)' }}>
+              <div style={{ height: '140px', position: 'relative' }}>
+                <img src={PG_IMAGES.lunch} alt="Lunch" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(6px)', padding: '3px 10px', borderRadius: '999px', color: '#fff', fontSize: '0.75rem', fontWeight: 700 }}>
+                  Lunch (12:30 - 3:00 PM)
+                </span>
+              </div>
+              <div style={{ padding: '1.1rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--dash-text)' }}>Today's Lunch</h4>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', lineHeight: 1.45 }}>
+                    {menuCosting.find(m => m.meal?.toLowerCase() === 'lunch')?.menu || 'Basmati Jeera Rice, Dal Tadka, Paneer Butter Masala, Fresh Phulkas & Salad'}
+                  </p>
+                </div>
+                <span style={{ display: 'inline-block', marginTop: '0.85rem', fontSize: '0.75rem', fontWeight: 700, color: '#10b981' }}>
+                  ✓ Balanced High-Protein Diet
+                </span>
+              </div>
+            </div>
+
+            {/* Dinner */}
+            <div style={{ background: 'var(--dash-subcard-bg)', border: '1px solid var(--dash-border)', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: 'var(--shadow-sm)' }}>
+              <div style={{ height: '140px', position: 'relative' }}>
+                <img src={PG_IMAGES.dinner} alt="Dinner" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(6px)', padding: '3px 10px', borderRadius: '999px', color: '#fff', fontSize: '0.75rem', fontWeight: 700 }}>
+                  Dinner (7:30 - 10:30 PM)
+                </span>
+              </div>
+              <div style={{ padding: '1.1rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--dash-text)' }}>Today's Dinner</h4>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', lineHeight: 1.45 }}>
+                    {menuCosting.find(m => m.meal?.toLowerCase() === 'dinner')?.menu || 'Whole Wheat Roti, Mixed Vegetable Korma, Steamed Rice, Dal Makhani & Gulab Jamun'}
+                  </p>
+                </div>
+                <span style={{ display: 'inline-block', marginTop: '0.85rem', fontSize: '0.75rem', fontWeight: 700, color: '#10b981' }}>
+                  ✓ Wholesome Homestyle Dinner
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* SCHEDULE TABLE */}
+          <div className="section-header">
+            <h4>Live Mess Schedule ({filterList(getDailyMessMenu()).length} Days)</h4>
+            <span style={{ fontSize: '0.8rem', color: 'var(--dash-muted)' }}>Updated live from Kitchen Staff</span>
+          </div>
+          <div className="table-responsive" style={{ marginBottom: '2rem' }}>
             <table>
               <thead><tr><th>Date</th><th>Breakfast</th><th>Lunch</th><th>Dinner</th></tr></thead>
               <tbody>
-                {filterList(messMenu).map(m => (
-                  <tr key={m.id}><td style={{ fontWeight: 600 }}>{m.date}</td><td>{m.breakfast}</td><td>{m.lunch}</td><td>{m.dinner}</td></tr>
+                {filterList(getDailyMessMenu()).map(m => (
+                  <tr key={m.id}>
+                    <td style={{ fontWeight: 700 }}>{m.date}</td>
+                    <td>{m.breakfast}</td>
+                    <td>{m.lunch}</td>
+                    <td>{m.dinner}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* DIETARY REQUESTS */}
+          <div className="section-header">
+            <h4>My Dietary & Food Requests ({specialRequests.length})</h4>
+          </div>
+          <div className="table-responsive">
+            <table>
+              <thead><tr><th>Meal</th><th>Request Details</th><th>Date</th><th>Kitchen Status</th></tr></thead>
+              <tbody>
+                {specialRequests.map(r => (
+                  <tr key={r.id}>
+                    <td><span style={{ background: 'var(--dash-subcard-bg)', padding: '4px 8px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 700 }}>{r.meal}</span></td>
+                    <td style={{ fontWeight: 600 }}>{r.request}</td>
+                    <td>{r.date}</td>
+                    <td>
+                      <span style={{ 
+                        color: r.status === 'Fulfilled' ? '#10b981' : '#f59e0b', 
+                        fontWeight: 700,
+                        background: r.status === 'Fulfilled' ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        fontSize: '0.8rem'
+                      }}>
+                        {r.status}
+                      </span>
+                    </td>
+                  </tr>
                 ))}
               </tbody>
             </table>
@@ -444,13 +613,65 @@ export default function TenantDashboard() {
         </div>
       )}
 
+      {/* AMENITY BOOKINGS WITH PG AMENITY SHOWCASES */}
       {activeTab === 'amenities' && (
         <div className="dashboard-section-card">
           <div className="section-header">
-            <h3>Amenity Bookings ({filterList(amenityBookings).length})</h3>
+            <div>
+              <h3>PG Amenities & Facilities</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--dash-muted)', marginTop: '2px' }}>
+                Complimentary lifestyle amenities included in your stay
+              </p>
+            </div>
             <button onClick={() => setShowAmenityModal(true)} className="btn-primary">
               <Plus size={16} /> Book Amenity Slot
             </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+            <div style={{ background: 'var(--dash-subcard-bg)', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--dash-border)' }}>
+              <div style={{ height: '120px' }}>
+                <img src={PG_IMAGES.gym} alt="Gym" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <div style={{ padding: '0.85rem' }}>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--dash-text)' }}>Modern Fitness Gym</h4>
+                <span style={{ fontSize: '0.75rem', color: 'var(--dash-muted)' }}>Open 06:00 AM - 10:00 PM</span>
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--dash-subcard-bg)', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--dash-border)' }}>
+              <div style={{ height: '120px' }}>
+                <img src={PG_IMAGES.studyLounge} alt="Study Lounge" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <div style={{ padding: '0.85rem' }}>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--dash-text)' }}>Quiet Study Lounge</h4>
+                <span style={{ fontSize: '0.75rem', color: 'var(--dash-muted)' }}>24/7 Silent Wi-Fi Cubicles</span>
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--dash-subcard-bg)', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--dash-border)' }}>
+              <div style={{ height: '120px' }}>
+                <img src={PG_IMAGES.recreationLounge} alt="Recreation Room" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <div style={{ padding: '0.85rem' }}>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--dash-text)' }}>Recreation & Games</h4>
+                <span style={{ fontSize: '0.75rem', color: 'var(--dash-muted)' }}>Table Tennis, Smart TV & Pool</span>
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--dash-subcard-bg)', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--dash-border)' }}>
+              <div style={{ height: '120px' }}>
+                <img src={PG_IMAGES.laundry} alt="Laundry" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <div style={{ padding: '0.85rem' }}>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--dash-text)' }}>Self-Service Laundry</h4>
+                <span style={{ fontSize: '0.75rem', color: 'var(--dash-muted)' }}>Automatic Washers & Steam Iron</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="section-header">
+            <h4>My Slot Bookings ({filterList(amenityBookings).length})</h4>
           </div>
           <div className="table-responsive">
             <table>
@@ -480,6 +701,7 @@ export default function TenantDashboard() {
         </div>
       )}
 
+      {/* ANNOUNCEMENTS & NOTICES */}
       {activeTab === 'announcements' && (
         <div className="dashboard-section-card">
           <div className="section-header"><h3>Announcements & Notices ({filterList(announcements).length})</h3></div>
@@ -838,7 +1060,7 @@ export default function TenantDashboard() {
             }}>
               <h4 style={{ margin: '0 0 0.5rem 0', color: roleThemeColor }}>Document Verification Summary</h4>
               <p style={{ margin: '0 0 0.75rem 0' }}>
-                This is a certified digital copy of the PG Resident Agreement entered between <strong>ArcNio Co-Living Management</strong> and the tenant.
+                This is a certified digital copy of the PG Resident Agreement entered between <strong>Arcnio Co-Living Management</strong> and the tenant.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', background: 'var(--dash-card-bg)', padding: '0.85rem', borderRadius: '8px', border: '1px solid var(--dash-border)' }}>
                 <div><strong>Digital Signature:</strong> Verified (Aadhar e-Sign)</div>
@@ -859,6 +1081,51 @@ export default function TenantDashboard() {
                 Close Preview
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* SPECIAL DIETARY REQUEST MODAL */}
+      {showDietaryModal && (
+        <div className="modal-backdrop" onClick={() => setShowDietaryModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Request Special Meal / Diet</h3>
+              <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: 'var(--dash-muted)' }}>
+                Directly sends notification to Kitchen Staff & Chef
+              </p>
+            </div>
+            <form onSubmit={handleSaveDietary} className="modal-form">
+              <div className="form-group">
+                <label>Meal</label>
+                <select name="meal" required defaultValue="Dinner">
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Dinner">Dinner</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Date</label>
+                <input type="text" name="date" defaultValue="02 Oct 2026" required />
+              </div>
+              <div className="form-group">
+                <label>Special Dietary Request / Instructions</label>
+                <textarea 
+                  name="request" 
+                  rows="3" 
+                  placeholder="e.g. Please pack dinner in lunchbox due to late office shift, or Jain food without onion/garlic..." 
+                  required 
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                <button type="button" className="btn-secondary" onClick={() => setShowDietaryModal(false)} style={{ flex: 1 }}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary" style={{ flex: 1 }}>
+                  Submit Request
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

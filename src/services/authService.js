@@ -77,7 +77,7 @@ const MOCK_USERS_ALL = [
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     email: 'manager@arcnio.com',
     phone: '+91 98765 11223',
-    assignedProperty: 'ArcNio Grand Co-Living, Sector 62',
+    assignedProperty: 'Arcnio Grand Co-Living, Sector 62',
     permissions: ['ROOM_OPS', 'TICKET_RESOLUTION', 'VISITOR_LOG']
   },
   {
